@@ -7,6 +7,21 @@ const menuData = [
     path: 'dashboard/analysis',
   },
   {
+    name: '报警',
+    icon: 'bulb',
+    path: 'alert',
+    children: [
+      {
+        name: '报警查询',
+        path: 'search-alert',
+      },
+      {
+        name: '联系人管理',
+        path: 'user-alert',
+      },
+    ],
+  },
+  {
     name: '表单页',
     icon: 'form',
     path: 'form',
