@@ -22,6 +22,21 @@ const menuData = [
     ],
   },
   {
+    name: '设置',
+    icon: 'calculator',
+    path: 'set',
+    children: [
+      {
+        name: '设备属性',
+        path: 'device-Data',
+      },
+      {
+        name: '报警属性',
+        path: 'alarm-Data',
+      },
+    ],
+  },
+  {
     name: '表单页',
     icon: 'form',
     path: 'form',
