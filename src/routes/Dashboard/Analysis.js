@@ -1,14 +1,12 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'dva';
-import { Map } from 'react-amap';
+import { Map, Markers } from 'react-amap';
 import {
   Row,
   Col,
   Icon,
   Card,
   Tabs,
-  Table,
-  Radio,
   DatePicker,
   Tooltip,
   Menu,
@@ -18,19 +16,7 @@ import {
   message,
 } from 'antd';
 import numeral from 'numeral';
-import {
-  ChartCard,
-  yuan,
-  MiniArea,
-  MiniBar,
-  MiniProgress,
-  Field,
-  Bar,
-  Pie,
-  TimelineChart,
-} from 'components/Charts';
-import Trend from 'components/Trend';
-import NumberInfo from 'components/NumberInfo';
+import { ChartCard, TimelineChart } from 'components/Charts';
 import { getTimeDistance } from '../../utils/utils';
 
 import styles from './Analysis.less';
@@ -105,17 +91,17 @@ const options = [
     ],
   },
 ];
-
+const randomPosition = () => ({
+  longitude: 120 + Math.random() * 20,
+  latitude: 30 + Math.random() * 20,
+});
 @connect(({ chart, loading }) => ({
   chart,
   loading: loading.effects['chart/fetch'],
 }))
 export default class Analysis extends Component {
   state = {
-    salesType: 'all',
-    currentTabKey: '',
     rangePickerValue: getTimeDistance('year'),
-    center: { longitude: 115, latitude: 30 },
   };
 
   componentDidMount() {
@@ -135,65 +121,27 @@ export default class Analysis extends Component {
     console.log(value);
   };
 
-  selectDate = type => {
-    this.setState({
-      rangePickerValue: getTimeDistance(type),
-    });
-
-    this.props.dispatch({
-      type: 'chart/fetchSalesData',
-    });
-  };
-
-  isActive(type) {
-    const { rangePickerValue } = this.state;
-    const value = getTimeDistance(type);
-    if (!rangePickerValue[0] || !rangePickerValue[1]) {
-      return;
-    }
-    if (
-      rangePickerValue[0].isSame(value[0], 'day') &&
-      rangePickerValue[1].isSame(value[1], 'day')
-    ) {
-      return styles.currentDate;
-    }
-  }
-
   render() {
-    const { rangePickerValue, salesType, currentTabKey } = this.state;
+    const { rangePickerValue } = this.state;
     const { chart, loading } = this.props;
-    const {
-      visitData,
-      visitData2,
-      salesData,
-      searchData,
-      offlineData,
-      offlineChartData,
-      salesTypeData,
-      salesTypeDataOnline,
-      salesTypeDataOffline,
-    } = chart;
-
-    const salesPieData =
-      salesType === 'all'
-        ? salesTypeData
-        : salesType === 'online' ? salesTypeDataOnline : salesTypeDataOffline;
-
-    const menu = (
-      <Menu>
-        <Menu.Item>操作一</Menu.Item>
-        <Menu.Item>操作二</Menu.Item>
-      </Menu>
-    );
-
-    const iconGroup = (
-      <span className={styles.iconGroup}>
-        <Dropdown overlay={menu} placement="bottomRight">
-          <Icon type="ellipsis" />
-        </Dropdown>
-      </span>
-    );
-
+    const { offlineChartData, devicebardata, deviceList } = chart;
+    const center = deviceList[0] ? deviceList[0].Geolocation : [];
+    console.log(center);
+    const devicePostion =
+      deviceList.length === 0
+        ? []
+        : deviceList.map(item => {
+            if (item) {
+              let position = {
+                longitude: item.Geolocation.longitude,
+                latitude: item.Geolocation.latitude,
+              };
+              return {
+                position,
+                myIndex: item.deviceName,
+              };
+            }
+          });
     const deviceExtra = (
       <div className={styles.salesExtraWrap}>
         <div className={styles.salesExtra}>
@@ -206,41 +154,6 @@ export default class Analysis extends Component {
         />
       </div>
     );
-
-    const columns = [
-      {
-        title: '排名',
-        dataIndex: 'index',
-        key: 'index',
-      },
-      {
-        title: '搜索关键词',
-        dataIndex: 'keyword',
-        key: 'keyword',
-        render: text => <a href="/">{text}</a>,
-      },
-      {
-        title: '用户数',
-        dataIndex: 'count',
-        key: 'count',
-        sorter: (a, b) => a.count - b.count,
-        className: styles.alignRight,
-      },
-      {
-        title: '周涨幅',
-        dataIndex: 'range',
-        key: 'range',
-        sorter: (a, b) => a.range - b.range,
-        render: (text, record) => (
-          <Trend flag={record.status === 1 ? 'down' : 'up'}>
-            <span style={{ marginRight: 4 }}>{text}%</span>
-          </Trend>
-        ),
-        align: 'right',
-      },
-    ];
-
-    const activeKey = currentTabKey || (offlineData[0] && offlineData[0].name);
 
     const topColResponsiveProps = {
       xs: 24,
@@ -264,7 +177,9 @@ export default class Analysis extends Component {
                   <Icon type="info-circle-o" />
                 </Tooltip>
               }
-              total={() => <span dangerouslySetInnerHTML={{ __html: 126560 }} />}
+              total={() => (
+                <span dangerouslySetInnerHTML={{ __html: devicebardata.allDeviceNumber }} />
+              )}
               contentHeight={46}
             />
           </Col>
@@ -278,7 +193,7 @@ export default class Analysis extends Component {
                   <Icon type="info-circle-o" />
                 </Tooltip>
               }
-              total={numeral(8846).format('0,0')}
+              total={numeral(devicebardata.onlineDeviceNumber).format('0,0')}
               contentHeight={46}
             />
           </Col>
@@ -292,7 +207,7 @@ export default class Analysis extends Component {
                   <Icon type="info-circle-o" />
                 </Tooltip>
               }
-              total={numeral(6560).format('0,0')}
+              total={numeral(devicebardata.alertDeviceNumber).format('0,0')}
               contentHeight={46}
             />
           </Col>
@@ -306,8 +221,8 @@ export default class Analysis extends Component {
                   <Icon type="info-circle-o" />
                 </Tooltip>
               }
-              total="78%"
-              contentHeight={numeral(6560).format('0,0')}
+              total={devicebardata.monthAlertNumber}
+              contentHeight={46}
             />
           </Col>
         </Row>
@@ -322,8 +237,10 @@ export default class Analysis extends Component {
                       <Map
                         center={{ longitude: 126.637174, latitude: 45.722127 }}
                         amapkey={'38198245da7e8bc70e018e83d7b81e87'}
-                        center={this.state.center}
-                      />
+                        center={center}
+                      >
+                        <Markers markers={devicePostion} />
+                      </Map>
                     </div>
                   </Col>
                   <Col xl={8} lg={12} md={12} sm={24} xs={24}>

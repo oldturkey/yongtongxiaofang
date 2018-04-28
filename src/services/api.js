@@ -77,3 +77,16 @@ export async function fakeRegister(params) {
 export async function queryNotices() {
   return request('/api/notices');
 }
+
+//项目接口
+export async function devicebardata() {
+  return request('Rapi/dashboard/devicebardata', {
+    method: 'POST',
+  });
+}
+//获取设备的deviceName以及所在地理位置表
+export async function deviceList() {
+  return request('Rapi/dashboard/deviceList', {
+    method: 'POST',
+  });
+}

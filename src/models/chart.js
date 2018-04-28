@@ -1,37 +1,21 @@
-import { fakeChartData } from '../services/api';
+import { devicebardata, deviceList } from '../services/api';
 
 export default {
   namespace: 'chart',
 
   state: {
-    visitData: [],
-    visitData2: [],
-    salesData: [],
-    searchData: [],
-    offlineData: [],
     offlineChartData: [],
-    salesTypeData: [],
-    salesTypeDataOnline: [],
-    salesTypeDataOffline: [],
-    radarData: [],
+    devicebardata: [],
+    deviceList: [],
     loading: false,
   },
 
   effects: {
     *fetch(_, { call, put }) {
-      const response = yield call(fakeChartData);
+      const [ListRes, barDataRes] = yield [call(deviceList), call(devicebardata)];
       yield put({
         type: 'save',
-        payload: response,
-      });
-    },
-    *fetchSalesData(_, { call, put }) {
-      const response = yield call(fakeChartData);
-      yield put({
-        type: 'save',
-        payload: {
-          salesData: response.salesData,
-        },
+        payload: { deviceList: ListRes, devicebardata: barDataRes },
       });
     },
   },
@@ -45,16 +29,9 @@ export default {
     },
     clear() {
       return {
-        visitData: [],
-        visitData2: [],
-        salesData: [],
-        searchData: [],
-        offlineData: [],
         offlineChartData: [],
-        salesTypeData: [],
-        salesTypeDataOnline: [],
-        salesTypeDataOffline: [],
-        radarData: [],
+        devicebardata: [],
+        deviceList: [],
       };
     },
   },

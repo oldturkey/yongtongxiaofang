@@ -137,4 +137,6 @@ const proxy = {
   },
 };
 
-export default (noProxy ? {} : delay(proxy, 1000));
+export default (noProxy
+  ? { 'POST /Rapi/(.*)': "http://192.168.31.158:8000/", '/api/(.*)': "localhost:8000" }
+  : delay(proxy, 1000));
