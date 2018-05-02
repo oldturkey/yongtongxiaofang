@@ -97,7 +97,13 @@ export async function devicepropsbydevicename(params) {
     body: params,
   });
 }
-
+//通过设备的deviceName名称获取设备的属性值
+export async function getdevicepropsbytimeanddevicename(params) {
+  return request('Rapi/dashboard/getdevicepropsbytimeanddevicename', {
+    method: 'POST',
+    body: params,
+  });
+}
 //获取联系人信息
 export async function getcontacts() {
   return request('Rapi/alert/getcontacts', {

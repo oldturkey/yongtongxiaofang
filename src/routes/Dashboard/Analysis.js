@@ -53,11 +53,12 @@ const options = [
 }))
 export default class Analysis extends Component {
   state = {
-    rangePickerValue: getTimeDistance('year'),
+    rangePickerValue: getTimeDistance('today'),
   };
 
   componentDidMount() {
-    this.props.dispatch({
+    const { dispatch } = this.props;
+    dispatch({
       type: 'chart/fetch',
     });
   }
@@ -77,18 +78,13 @@ export default class Analysis extends Component {
       },
     });
   };
-
+  handleRangePickerChange = value => {
+    this.setState({ rangePickerValue: value });
+  };
   render() {
     const { rangePickerValue } = this.state;
     const { chart, loading } = this.props;
-    const {
-      offlineChartData,
-      devicebardata,
-      deviceList,
-      event,
-      hydraulicPress,
-      liquidLevel,
-    } = chart;
+    const { devicebardata, deviceList, event, hydraulicPress, liquidLevel, chartData } = chart;
     const center = deviceList && deviceList[0] ? deviceList[0].Geolocation : [];
     const devicePostion =
       deviceList.length === 0
@@ -111,13 +107,24 @@ export default class Analysis extends Component {
           <Cascader options={options} onChange={this.onChange} placeholder="请选择设备地址" />
         </div>
         <RangePicker
+          showTime={{ format: 'HH:mm' }}
+          format="YYYY-MM-DD HH:mm"
           value={rangePickerValue}
           onChange={this.handleRangePickerChange}
-          style={{ width: 256 }}
+          style={{ width: 276 }}
         />
       </div>
     );
 
+    const offlineChartData =
+      chartData &&
+      chartData.map(item => {
+        return {
+          x: item.gmtCreate,
+          y1: item.hydraulicPress,
+          y2: item.liquidLevel,
+        };
+      });
     let nowData = [
       {
         title: '灭火器检测',

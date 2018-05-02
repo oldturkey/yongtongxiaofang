@@ -71,7 +71,7 @@ export default class TableList extends PureComponent {
     formValues: {},
   };
 
-  componentDidMount() {
+  componentWillMount() {
     const { dispatch } = this.props;
     dispatch({
       type: 'rule/fetch',
