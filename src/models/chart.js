@@ -1,4 +1,4 @@
-import { devicebardata, deviceList } from '../services/api';
+import { devicebardata, deviceList, devicepropsbydevicename } from '../services/api';
 
 export default {
   namespace: 'chart',
@@ -16,6 +16,13 @@ export default {
       yield put({
         type: 'save',
         payload: { deviceList: ListRes, devicebardata: barDataRes },
+      });
+    },
+    *fetchCurrentDevice({ payload }, { call, put }) {
+      const response = yield call(devicepropsbydevicename, payload);
+      yield put({
+        type: 'save',
+        payload: response,
       });
     },
   },

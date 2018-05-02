@@ -104,11 +104,8 @@ class BasicLayout extends React.PureComponent {
         isMobile: mobile,
       });
     });
-    this.props.dispatch({
-      type: 'user/fetchCurrent',
-    });
   }
-  componentWillUnmount(){
+  componentWillUnmount() {
     unenquireScreen(this.enquireHandler);
   }
   getPageTitle() {

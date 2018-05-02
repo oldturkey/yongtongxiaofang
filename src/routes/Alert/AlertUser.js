@@ -1,20 +1,32 @@
-import React, { PureComponent, Fragment } from 'react';
-import { Table, Button, Input, message, Popconfirm, Divider } from 'antd';
+import React, { Component, Fragment } from 'react';
+import { connect } from 'dva';
+import { Table, Button, Input, message, Popconfirm, Divider, Form } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import styles from '../Dashboard/Analysis.less';
-
-export default class AlertUser extends React.Component {
+@connect(({ alert, loading }) => ({
+  alert,
+  loading: loading.effects['alert/fetch'],
+}))
+@Form.create()
+export default class AlertUser extends Component {
   state = {
     data: [],
     loading: false,
   };
-  componentWillReceiveProps(nextProps) {
-    if ('value' in nextProps) {
-      this.setState({
-        data: nextProps.value,
-      });
-    }
+
+  componentDidMount() {
+    this.props.dispatch({
+      type: 'alert/fetch',
+    });
   }
+
+  componentWillUnmount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'alert/clear',
+    });
+  }
+
   getRowByKey(key, newData) {
     return (newData || this.state.data).filter(item => item.key === key)[0];
   }

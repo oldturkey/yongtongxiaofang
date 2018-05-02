@@ -24,39 +24,6 @@ import styles from './Analysis.less';
 const { TabPane } = Tabs;
 const { RangePicker } = DatePicker;
 
-const rankingListData = [];
-for (let i = 0; i < 7; i += 1) {
-  rankingListData.push({
-    title: `工专路 ${i} 号店`,
-    total: 323234,
-  });
-}
-const nowData = [
-  {
-    title: '灭火器检测',
-    value: 1,
-  },
-  {
-    title: '漏水检测',
-    value: 0,
-  },
-  {
-    title: '水压值',
-    value: '10KPA',
-  },
-  {
-    title: '液位值',
-    value: 1,
-  },
-  {
-    title: '水压报警',
-    value: 1,
-  },
-  {
-    title: '低液位报警',
-    value: 1,
-  },
-];
 const options = [
   {
     value: '浙江',
@@ -67,34 +34,19 @@ const options = [
         label: '杭州',
         children: [
           {
-            value: '西湖',
-            label: '西湖',
+            value: 'CMH8vNgy99sWbY9SDbNJ',
+            label: 'CMH8vNgy99sWbY9SDbNJ',
           },
-        ],
-      },
-    ],
-  },
-  {
-    value: '江苏',
-    label: '江苏',
-    children: [
-      {
-        value: '南京',
-        label: '南京',
-        children: [
           {
-            value: '中华门',
-            label: '中华门',
+            value: 'realDevice',
+            label: 'realDevice',
           },
         ],
       },
     ],
   },
 ];
-const randomPosition = () => ({
-  longitude: 120 + Math.random() * 20,
-  latitude: 30 + Math.random() * 20,
-});
+
 @connect(({ chart, loading }) => ({
   chart,
   loading: loading.effects['chart/fetch'],
@@ -118,15 +70,26 @@ export default class Analysis extends Component {
   }
 
   onChange = value => {
-    console.log(value);
+    this.props.dispatch({
+      type: 'chart/fetchCurrentDevice',
+      payload: {
+        deviceName: value[value.length - 1],
+      },
+    });
   };
 
   render() {
     const { rangePickerValue } = this.state;
     const { chart, loading } = this.props;
-    const { offlineChartData, devicebardata, deviceList } = chart;
-    const center = deviceList[0] ? deviceList[0].Geolocation : [];
-    console.log(center);
+    const {
+      offlineChartData,
+      devicebardata,
+      deviceList,
+      event,
+      hydraulicPress,
+      liquidLevel,
+    } = chart;
+    const center = deviceList && deviceList[0] ? deviceList[0].Geolocation : [];
     const devicePostion =
       deviceList.length === 0
         ? []
@@ -155,6 +118,32 @@ export default class Analysis extends Component {
       </div>
     );
 
+    let nowData = [
+      {
+        title: '灭火器检测',
+        value: event && event.extinguisherDetectPost,
+      },
+      {
+        title: '漏水检测',
+        value: event && event.waterLeakagePost,
+      },
+      {
+        title: '水压值',
+        value: hydraulicPress && hydraulicPress + ' KPa(千帕)',
+      },
+      {
+        title: '液位值',
+        value: liquidLevel && liquidLevel + ' m(米)',
+      },
+      {
+        title: '水压报警',
+        value: event && event.hydraulicPressAbnormalPost,
+      },
+      {
+        title: '低液位报警',
+        value: event && event.lowLiquildLevelPost,
+      },
+    ];
     const topColResponsiveProps = {
       xs: 24,
       sm: 12,
@@ -246,7 +235,15 @@ export default class Analysis extends Component {
                   <Col xl={8} lg={12} md={12} sm={24} xs={24}>
                     <Row>
                       {nowData.map((item, i) => (
-                        <Col xl={12} lg={12} md={12} sm={12} xs={12} style={{ padding: 40 }}>
+                        <Col
+                          xl={12}
+                          lg={12}
+                          md={12}
+                          sm={12}
+                          xs={12}
+                          style={{ padding: 40 }}
+                          key={i}
+                        >
                           <h4>{item.title}</h4>
                           <p style={{ color: 'rgb(31,130,255)' }}>
                             {item.value === 1 ? '是' : item.value === 0 ? '否' : item.value}

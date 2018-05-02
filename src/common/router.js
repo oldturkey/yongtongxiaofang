@@ -74,10 +74,10 @@ export const getRouterData = app => {
     },
     '/dashboard/analysis': {
       name: '主页',
-      component: dynamicWrapper(app, ['chart'], () => import('../routes/Dashboard/Analysis')),
+      component: dynamicWrapper(app, ['alert'], () => import('../routes/Dashboard/Analysis')),
     },
     '/alert/search-alert': {
-      component: dynamicWrapper(app, ['chart'], () => import('../routes/Alert/SearchAlert')),
+      component: dynamicWrapper(app, ['alert'], () => import('../routes/Alert/SearchAlert')),
     },
     '/alert/user-alert': {
       component: dynamicWrapper(app, ['chart'], () => import('../routes/Alert/AlertUser')),
