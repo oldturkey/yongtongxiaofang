@@ -10,10 +10,24 @@ import styles from '../Dashboard/Analysis.less';
 @Form.create()
 export default class AlertUser extends Component {
   state = {
-    data: [],
+    data: this.props.alert.alertUserData,
     loading: false,
   };
-
+  componentWillReceiveProps(nextProps) {
+    if ('alert' in nextProps) {
+      const nextData = nextProps.alert.alertUserData;
+      nextData.map((item, i) => {
+        item.key = i;
+      });
+      this.setState({
+        data: nextData,
+      });
+    }
+  }
+  // user &&
+  //   user.map((item, i) => {
+  //     item.key = i;
+  //   });
   componentDidMount() {
     this.props.dispatch({
       type: 'alert/fetch',
@@ -235,6 +249,7 @@ export default class AlertUser extends Component {
         },
       },
     ];
+
     return (
       <PageHeaderLayout title="联系人管理" content="用于查询管理报警联系人。">
         <Table
