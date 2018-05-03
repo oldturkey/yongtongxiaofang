@@ -1,20 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'dva';
 import { Map, Markers } from 'react-amap';
-import {
-  Row,
-  Col,
-  Icon,
-  Card,
-  Tabs,
-  DatePicker,
-  Tooltip,
-  Menu,
-  Dropdown,
-  Avatar,
-  Cascader,
-  message,
-} from 'antd';
+import { Row, Col, Icon, Card, Tabs, DatePicker, Tooltip, Avatar, Cascader } from 'antd';
 import numeral from 'numeral';
 import { ChartCard, TimelineChart } from 'components/Charts';
 import { getTimeDistance } from '../../utils/utils';
@@ -40,6 +27,10 @@ const options = [
           {
             value: 'realDevice',
             label: 'realDevice',
+          },
+          {
+            value: 'tymNiFjK2R4w5IysXpCr',
+            label: 'tymNiFjK2R4w5IysXpCr',
           },
         ],
       },
@@ -71,27 +62,46 @@ export default class Analysis extends Component {
   }
 
   onChange = value => {
+    const time = this.state.rangePickerValue;
     this.props.dispatch({
       type: 'chart/fetchCurrentDevice',
       payload: {
         deviceName: value[value.length - 1],
+        beginTime: time[0].format('YYYY-MM-DD HH:mm'),
+        endTime: time[1].format('YYYY-MM-DD HH:mm'),
       },
     });
   };
   handleRangePickerChange = value => {
     this.setState({ rangePickerValue: value });
+    this.props.dispatch({
+      type: 'chart/fetchCurrentDevice',
+      payload: {
+        deviceName: this.props.chart.deviceName,
+        beginTime: value[0].format('YYYY-MM-DD HH:mm'),
+        endTime: value[1].format('YYYY-MM-DD HH:mm'),
+      },
+    });
   };
   render() {
     const { rangePickerValue } = this.state;
     const { chart, loading } = this.props;
-    const { devicebardata, deviceList, event, hydraulicPress, liquidLevel, chartData } = chart;
-    const center = deviceList && deviceList[0] ? deviceList[0].Geolocation : [];
+    const {
+      devicebardata,
+      deviceList,
+      event,
+      hydraulicPress,
+      liquidLevel,
+      chartData,
+      Geolocation,
+    } = chart;
+    const center = Geolocation && Geolocation;
     const devicePostion =
       deviceList.length === 0
         ? []
         : deviceList.map(item => {
             if (item) {
-              let position = {
+              const position = {
                 longitude: item.Geolocation.longitude,
                 latitude: item.Geolocation.latitude,
               };
@@ -125,7 +135,7 @@ export default class Analysis extends Component {
           y2: item.liquidLevel,
         };
       });
-    let nowData = [
+    const nowData = [
       {
         title: '灭火器检测',
         value: event && event.extinguisherDetectPost,
@@ -230,11 +240,7 @@ export default class Analysis extends Component {
                 <Row>
                   <Col xl={16} lg={12} md={12} sm={24} xs={24}>
                     <div className={styles.salesBar} style={{ height: 450 }}>
-                      <Map
-                        center={{ longitude: 126.637174, latitude: 45.722127 }}
-                        amapkey={'38198245da7e8bc70e018e83d7b81e87'}
-                        center={center}
-                      >
+                      <Map amapkey="38198245da7e8bc70e018e83d7b81e87" center={center}>
                         <Markers markers={devicePostion} />
                       </Map>
                     </div>
@@ -269,7 +275,7 @@ export default class Analysis extends Component {
                         <TimelineChart
                           height={400}
                           data={offlineChartData}
-                          titleMap={{ y1: '水压值', y2: '液位值', y3: '灭火器监测' }}
+                          titleMap={{ y1: '水压值', y2: '液位值' }}
                         />
                       </div>
                     </div>

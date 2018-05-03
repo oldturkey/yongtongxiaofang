@@ -15,7 +15,6 @@ export default class TimelineChart extends React.Component {
       titleMap = {
         y1: 'y1',
         y2: 'y2',
-        y3: 'y3',
       },
       borderWidth = 2,
       data = [

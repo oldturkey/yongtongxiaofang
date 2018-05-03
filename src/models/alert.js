@@ -14,7 +14,7 @@ export default {
       yield put({
         type: 'save',
         payload: {
-          alertUserData: response.data,
+          alertUserData: response,
         },
       });
     },

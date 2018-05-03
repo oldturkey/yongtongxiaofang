@@ -9,7 +9,6 @@ export default {
   namespace: 'chart',
 
   state: {
-    offlineChartData: [],
     devicebardata: [],
     deviceList: [],
     loading: false,
@@ -26,7 +25,7 @@ export default {
       const begin = getTimeDistance('today')[0].format('YYYY-MM-DD HH:mm');
       const end = getTimeDistance('today')[1].format('YYYY-MM-DD HH:mm');
       const getback = yield call(getdevicepropsbytimeanddevicename, {
-        deviceName: ListRes[1].deviceName,
+        deviceName: ListRes[0].deviceName,
         beginTime: begin,
         endTime: end,
       });
@@ -37,9 +36,10 @@ export default {
     },
     *fetchCurrentDevice({ payload }, { call, put }) {
       const response = yield call(devicepropsbydevicename, payload);
+      const getback = yield call(getdevicepropsbytimeanddevicename, payload);
       yield put({
         type: 'save',
-        payload: response,
+        payload: { ...response, chartData: getback },
       });
     },
   },
@@ -53,7 +53,6 @@ export default {
     },
     clear() {
       return {
-        offlineChartData: [],
         devicebardata: [],
         deviceList: [],
       };
