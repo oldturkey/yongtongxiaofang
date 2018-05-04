@@ -15,9 +15,9 @@ export default class AlertUser extends Component {
   };
   componentWillReceiveProps(nextProps) {
     if ('alert' in nextProps) {
-      const nextData = nextProps.alert.alertUserData;
-      nextData.map((item, i) => {
+      const nextData = nextProps.alert.alertUserData.map((item, i) => {
         item.key = i;
+        return item;
       });
       this.setState({
         data: nextData,
