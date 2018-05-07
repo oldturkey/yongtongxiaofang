@@ -84,25 +84,6 @@ export default class TimelineChart extends React.Component {
       },
     };
 
-    const SliderGen = () => (
-      <Slider
-        padding={[0, padding[1] + 20, 0, padding[3]]}
-        width="auto"
-        height={26}
-        xAxis="x"
-        yAxis="y1"
-        scales={{ x: timeScale }}
-        data={data}
-        start={ds.state.start}
-        end={ds.state.end}
-        backgroundChart={{ type: 'line' }}
-        onChange={({ startValue, endValue }) => {
-          ds.setState('start', startValue);
-          ds.setState('end', endValue);
-        }}
-      />
-    );
-
     return (
       <div className={styles.timelineChart} style={{ height: height + 30 }}>
         <div>
@@ -113,9 +94,6 @@ export default class TimelineChart extends React.Component {
             <Legend name="key" position="top" />
             <Geom type="line" position="x*value" size={borderWidth} color="key" />
           </Chart>
-          <div style={{ marginRight: -20 }}>
-            <SliderGen />
-          </div>
         </div>
       </div>
     );
