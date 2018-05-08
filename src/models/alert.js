@@ -1,10 +1,11 @@
-import { getcontacts } from '../services/api';
-
+import { getcontacts, getalertlist } from '../services/api';
+import { getTimeDistance } from '../utils/utils';
 export default {
   namespace: 'alert',
 
   state: {
     alertUserData: [],
+    alertList: [],
     loading: false,
   },
 
@@ -18,6 +19,17 @@ export default {
         },
       });
     },
+    *fetchCurrentDevice({ payload }, { call, put, race }) {
+      const { response } = yield race({
+        response: call(getalertlist, payload),
+      });
+      // const response = yield call(getalertlist, payload);
+      if (response)
+        yield put({
+          type: 'save',
+          payload: { alertList: response },
+        });
+    },
   },
 
   reducers: {
@@ -30,6 +42,7 @@ export default {
     clear() {
       return {
         alertUserData: [],
+        alertList: [],
       };
     },
   },

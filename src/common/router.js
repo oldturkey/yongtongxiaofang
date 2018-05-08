@@ -80,7 +80,7 @@ export const getRouterData = app => {
       component: dynamicWrapper(app, ['alert'], () => import('../routes/Alert/SearchAlert')),
     },
     '/alert/user-alert': {
-      component: dynamicWrapper(app, ['chart'], () => import('../routes/Alert/AlertUser')),
+      component: dynamicWrapper(app, ['alert'], () => import('../routes/Alert/AlertUser')),
     },
     '/dashboard/monitor': {
       component: dynamicWrapper(app, ['monitor'], () => import('../routes/Dashboard/Monitor')),

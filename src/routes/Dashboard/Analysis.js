@@ -29,8 +29,8 @@ const options = [
             label: 'realDevice',
           },
           {
-            value: 'tymNiFjK2R4w5IysXpCr',
-            label: 'tymNiFjK2R4w5IysXpCr',
+            value: '0001',
+            label: '0001',
           },
         ],
       },

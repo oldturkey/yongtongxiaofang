@@ -110,3 +110,10 @@ export async function getcontacts() {
     method: 'POST',
   });
 }
+//获取设备的报警列表，通过起止时间
+export async function getalertlist(params) {
+  return request('Rapi/alert/getalertlist', {
+    method: 'POST',
+    body: params,
+  });
+}
