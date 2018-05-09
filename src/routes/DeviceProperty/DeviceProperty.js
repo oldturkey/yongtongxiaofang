@@ -114,20 +114,7 @@ export default class DeviceProperty extends Component {
     this.setState({ data: newData });
     this.props.onChange(newData);
   }
-  newMember = () => {
-    const newData = this.state.data.map(item => ({ ...item }));
-    newData.push({
-      key: `NEW_TEMP_ID_${this.index}`,
-      detial: '',
-      name: '',
-      phone: '',
-      email: '',
-      editable: true,
-      isNew: true,
-    });
-    this.index += 1;
-    this.setState({ data: newData });
-  };
+
   handleKeyPress(e, key) {
     if (e.key === 'Enter') {
       this.saveRow(e, key);
@@ -188,57 +175,16 @@ export default class DeviceProperty extends Component {
         title: '设备编号',
         dataIndex: 'deviceName',
         key: 'deviceName',
-
-        render: (text, record) => {
-          if (record.editable) {
-            return (
-              <Input
-                value={text}
-                autoFocus
-                onChange={e => this.handleFieldChange(e, 'deviceName', record.key)}
-                onKeyPress={e => this.handleKeyPress(e, record.key)}
-                placeholder="成员姓名"
-              />
-            );
-          }
-          return text;
-        },
       },
       {
         title: '设备位置',
         dataIndex: 'location',
         key: 'location',
-        render: (text, record) => {
-          if (record.editable) {
-            return (
-              <Input
-                value={text}
-                onChange={e => this.handleFieldChange(e, 'location', record.key)}
-                onKeyPress={e => this.handleKeyPress(e, record.key)}
-                placeholder="设备位置"
-              />
-            );
-          }
-          return text;
-        },
       },
       {
         title: '硬件版本号',
         dataIndex: 'softVersion',
         key: 'softVersion',
-        render: (text, record) => {
-          if (record.editable) {
-            return (
-              <Input
-                value={text}
-                onChange={e => this.handleFieldChange(e, 'softVersion', record.key)}
-                onKeyPress={e => this.handleKeyPress(e, record.key)}
-                placeholder="硬件版本号"
-              />
-            );
-          }
-          return text;
-        },
       },
       {
         title: '液位报警阈值',
@@ -359,14 +305,6 @@ export default class DeviceProperty extends Component {
                       return record.editable ? styles.editable : '';
                     }}
                   />
-                  <Button
-                    style={{ width: '100%', marginTop: 16, marginBottom: 8 }}
-                    type="dashed"
-                    onClick={this.newMember}
-                    icon="plus"
-                  >
-                    新增成员
-                  </Button>
                 </div>
               </TabPane>
             </Tabs>
