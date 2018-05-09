@@ -127,14 +127,18 @@ export default class Analysis extends Component {
     );
 
     const offlineChartData =
-      chartData &&
-      chartData.map(item => {
-        return {
-          x: item.gmtCreate,
-          y1: item.hydraulicPress,
-          y2: item.liquidLevel,
-        };
-      });
+      chartData && chartData.length > 0
+        ? chartData.map(item => {
+            return {
+              x: item.gmtCreate,
+              y1: item.hydraulicPress,
+              y2: item.liquidLevel,
+            };
+          })
+        : [
+            { x: new Date().getTime() + 1000 * 60 * 30 * 1, y1: 0, y2: 0 },
+            { x: new Date().getTime() + 1000 * 60 * 30 * 20, y1: 0, y2: 0 },
+          ];
     const nowData = [
       {
         title: '灭火器检测',

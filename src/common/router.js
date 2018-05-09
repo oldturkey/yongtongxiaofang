@@ -82,6 +82,11 @@ export const getRouterData = app => {
     '/alert/user-alert': {
       component: dynamicWrapper(app, ['alert'], () => import('../routes/Alert/AlertUser')),
     },
+    '/property/device-Data': {
+      component: dynamicWrapper(app, ['property'], () =>
+        import('../routes/DeviceProperty/DeviceProperty')
+      ),
+    },
     '/dashboard/monitor': {
       component: dynamicWrapper(app, ['monitor'], () => import('../routes/Dashboard/Monitor')),
     },

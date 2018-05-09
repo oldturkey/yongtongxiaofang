@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Table, Icon, message, Cascader, DatePicker, Card, Tabs } from 'antd';
+import { Table, Cascader, DatePicker, Card, Tabs } from 'antd';
 import { connect } from 'dva';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import styles from '../Dashboard/Analysis.less';
@@ -68,7 +68,6 @@ export default class Alert extends React.Component {
   }
   onChange = value => {
     const time = this.state.rangePickerValue;
-    console.log(value);
     this.setState({ deviceName: value.length > 0 ? value : '' });
     this.props.dispatch({
       type: 'alert/fetchCurrentDevice',

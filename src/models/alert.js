@@ -19,17 +19,13 @@ export default {
         },
       });
     },
-    *fetchCurrentDevice({ payload }, { call, put, race }) {
-      const { response } = yield race({
-        response: call(getalertlist, payload),
-      });
-      // const response = yield call(getalertlist, payload);
-      if (response)
-        yield put({
-          type: 'save',
-          payload: { alertList: response },
-        });
-    },
+    fetchCurrentDevice: [
+      function* fn({ payload }, { call, put }) {
+        const response = yield call(getalertlist, payload);
+        yield put({ type: 'save', payload: { alertList: response } });
+      },
+      { type: 'takeLatest' },
+    ],
   },
 
   reducers: {

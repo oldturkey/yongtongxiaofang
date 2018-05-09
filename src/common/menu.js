@@ -24,15 +24,11 @@ const menuData = [
   {
     name: '设置',
     icon: 'calculator',
-    path: 'set',
+    path: 'property',
     children: [
       {
         name: '设备属性',
         path: 'device-Data',
-      },
-      {
-        name: '报警属性',
-        path: 'alarm-Data',
       },
     ],
   },

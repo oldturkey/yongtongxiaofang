@@ -117,3 +117,9 @@ export async function getalertlist(params) {
     body: params,
   });
 }
+//获取联系人信息
+export async function getdevicelist() {
+  return request('Rapi/setting/getdevicelist', {
+    method: 'POST',
+  });
+}
