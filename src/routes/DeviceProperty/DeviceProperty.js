@@ -11,10 +11,11 @@ import {
   Card,
   Tabs,
   Cascader,
+  Icon,
 } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import styles from '../Dashboard/Analysis.less';
-
+import EditableCell from './EditableCell';
 const { TabPane } = Tabs;
 const options = [
   {
@@ -42,6 +43,7 @@ const options = [
     ],
   },
 ];
+
 @connect(({ property, loading }) => ({
   property,
   loading: loading.effects['property/fetch'],
@@ -82,92 +84,94 @@ export default class DeviceProperty extends Component {
   onChange = value => {
     const time = this.state.rangePickerValue;
     this.setState({ deviceName: value.length > 0 ? value : '' });
-    // this.props.dispatch({
-    //   type: 'alert/fetchCurrentDevice',
-    //   payload: {
-    //     deviceName: value.length > 0 ? value[value.length - 1] : '',
-    //     beginTime: time[0].format('YYYY-MM-DD HH:mm'),
-    //     endTime: time[1].format('YYYY-MM-DD HH:mm'),
-    //   },
-    // });
   };
-  getRowByKey(key, newData) {
-    return (newData || this.state.data).filter(item => item.key === key)[0];
-  }
-  index = 0;
-  cacheOriginData = {};
-  toggleEditable = (e, key) => {
-    e.preventDefault();
-    const newData = this.state.data.map(item => ({ ...item }));
-    const target = this.getRowByKey(key, newData);
-    if (target) {
-      // 进入编辑状态时保存原始数据
-      if (!target.editable) {
-        this.cacheOriginData[key] = { ...target };
-      }
-      target.editable = !target.editable;
-      this.setState({ data: newData });
-    }
-  };
-  remove(key) {
-    const newData = this.state.data.filter(item => item.key !== key);
-    this.setState({ data: newData });
-    this.props.onChange(newData);
-  }
+  onCellChange = (deviceName, dataIndex, hydata) => {
+    const { dispatch } = this.props;
+    return value => {
+      switch (dataIndex) {
+        case 'lowLiquildLevelThreshold':
+          dispatch({
+            type: 'property/fetchCurrent',
+            payload: {
+              deviceName: deviceName,
+              setParam: [
+                {
+                  method: 'liquidLevelThresholdSet',
+                  inputParams: { liquidLevelThreshold: parseFloat(value) },
+                },
+              ],
+            },
+            callback: () => {
+              message.success('修改成功');
+            },
+          });
 
-  handleKeyPress(e, key) {
-    if (e.key === 'Enter') {
-      this.saveRow(e, key);
-    }
-  }
-  handleFieldChange(e, fieldName, key) {
-    const newData = this.state.data.map(item => ({ ...item }));
-    const target = this.getRowByKey(key, newData);
-    if (target) {
-      target[fieldName] = e.target.value;
-      this.setState({ data: newData });
-    }
-  }
-  saveRow(e, key) {
-    e.persist();
-    this.setState({
-      loading: true,
-    });
-    setTimeout(() => {
-      if (this.clickedCancel) {
-        this.clickedCancel = false;
-        return;
+          break;
+        case 'reportingPeriod':
+          dispatch({
+            type: 'property/fetchCurrent',
+            payload: {
+              deviceName: deviceName,
+              setParam: [
+                {
+                  method: 'uploadFrequencySet',
+                  inputParams: {
+                    uploadFrequency: parseInt(value),
+                  },
+                },
+              ],
+            },
+            callback: () => {
+              message.success('修改成功');
+            },
+          });
+          break;
+        case 'hydraulicPressUpThreshold':
+          dispatch({
+            type: 'property/fetchCurrent',
+            payload: {
+              deviceName: deviceName,
+              setParam: [
+                {
+                  method: 'hydraulicPressThresholdSet',
+                  inputParams: {
+                    hydraulicPressUpperThreshold: parseFloat(value),
+                    hydraulicPressLowThreshold: parseFloat(hydata),
+                  },
+                },
+              ],
+            },
+            callback: () => {
+              message.success('修改成功');
+            },
+          });
+          break;
+        case 'hydraulicPressDownThreshold':
+          dispatch({
+            type: 'property/fetchCurrent',
+            payload: {
+              deviceName: deviceName,
+              setParam: [
+                {
+                  method: 'hydraulicPressThresholdSet',
+                  inputParams: {
+                    hydraulicPressUpperThreshold: parseFloat(hydata),
+                    hydraulicPressLowThreshold: parseFloat(value),
+                  },
+                },
+              ],
+            },
+            callback: () => {
+              message.success('修改成功');
+            },
+          });
+          break;
+        default:
+          break;
       }
-      const target = this.getRowByKey(key) || {};
-      if (!target.phone || !target.name || !target.detial || !target.email) {
-        message.error('请填写完整成员信息。');
-        e.target.focus();
-        this.setState({
-          loading: false,
-        });
-        return;
-      }
-      delete target.isNew;
-      this.toggleEditable(e, key);
-      this.props.onChange(this.state.data);
-      this.setState({
-        loading: false,
-      });
-    }, 500);
-  }
-  cancel(e, key) {
-    this.clickedCancel = true;
-    e.preventDefault();
-    const newData = this.state.data.map(item => ({ ...item }));
-    const target = this.getRowByKey(key, newData);
-    if (this.cacheOriginData[key]) {
-      Object.assign(target, this.cacheOriginData[key]);
-      target.editable = false;
-      delete this.cacheOriginData[key];
-    }
-    this.setState({ data: newData });
-    this.clickedCancel = false;
-  }
+    };
+  };
+
   render() {
     const { loading } = this.props;
     const columns = [
@@ -175,108 +179,92 @@ export default class DeviceProperty extends Component {
         title: '设备编号',
         dataIndex: 'deviceName',
         key: 'deviceName',
+        width: '10%',
+        align: 'center',
       },
       {
         title: '设备位置',
         dataIndex: 'location',
         key: 'location',
+        width: '20%',
+        align: 'center',
       },
       {
         title: '硬件版本号',
         dataIndex: 'softVersion',
         key: 'softVersion',
+        width: '10%',
+        align: 'center',
       },
       {
         title: '液位报警阈值',
-        dataIndex: 'liquidLevelThreshold',
-        key: 'liquidLevelThreshold',
+        dataIndex: 'lowLiquildLevelThreshold',
+        key: 'lowLiquildLevelThreshold',
+        width: '15%',
+        align: 'center',
         render: (text, record) => {
-          if (record.editable) {
-            return (
-              <Input
-                value={text}
-                onChange={e => this.handleFieldChange(e, 'liquidLevelThreshold', record.key)}
-                onKeyPress={e => this.handleKeyPress(e, record.key)}
-                placeholder="液位报警阈值"
-              />
-            );
-          }
-          return text;
+          return (
+            <EditableCell
+              value={text}
+              type="propertyChange"
+              onChange={this.onCellChange(record.deviceName, 'lowLiquildLevelThreshold')}
+            />
+          );
         },
       },
       {
-        title: '水压报警阈值',
-        dataIndex: 'hydraulicPressUpperThreshold',
-        key: 'hydraulicPressUpperThreshold',
+        title: '水压报警阈值上限',
+        dataIndex: 'hydraulicPressUpThreshold',
+        key: 'hydraulicPressUpThreshold',
+        width: '15%',
+        align: 'center',
         render: (text, record) => {
-          if (record.editable) {
-            return (
-              <Input
-                value={text}
-                onChange={e =>
-                  this.handleFieldChange(e, 'hydraulicPressUpperThreshold', record.key)
-                }
-                onKeyPress={e => this.handleKeyPress(e, record.key)}
-                placeholder="水压报警阈值"
-              />
-            );
-          }
-          return text;
+          return (
+            <EditableCell
+              value={text}
+              type="propertyChange"
+              onChange={this.onCellChange(
+                record.deviceName,
+                'hydraulicPressUpThreshold',
+                record.hydraulicPressDownThreshold
+              )}
+            />
+          );
+        },
+      },
+      {
+        title: '水压报警阈值下限',
+        dataIndex: 'hydraulicPressDownThreshold',
+        key: 'hydraulicPressDownThreshold',
+        width: '15%',
+        align: 'center',
+        render: (text, record) => {
+          return (
+            <EditableCell
+              value={text}
+              type="propertyChange"
+              onChange={this.onCellChange(
+                record.deviceName,
+                'hydraulicPressDownThreshold',
+                record.hydraulicPressUpThreshold
+              )}
+            />
+          );
         },
       },
       {
         title: '属性上报周期',
         dataIndex: 'reportingPeriod',
         key: 'reportingPeriod',
+        width: '15%',
+        align: 'center',
         render: (text, record) => {
-          if (record.editable) {
-            return (
-              <Input
-                value={text}
-                onChange={e => this.handleFieldChange(e, 'reportingPeriod', record.key)}
-                onKeyPress={e => this.handleKeyPress(e, record.key)}
-                placeholder="属性上报周期"
-              />
-            );
-          }
-          return text;
-        },
-      },
-      {
-        title: '操作',
-        key: 'action',
-        render: (text, record) => {
-          if (!!record.editable && this.state.loading) {
-            return null;
-          }
-          if (record.editable) {
-            if (record.isNew) {
-              return (
-                <span>
-                  <a onClick={e => this.saveRow(e, record.key)}>添加</a>
-                  <Divider type="vertical" />
-                  <Popconfirm title="是否要删除此行？" onConfirm={() => this.remove(record.key)}>
-                    <a>删除</a>
-                  </Popconfirm>
-                </span>
-              );
-            }
-            return (
-              <span>
-                <a onClick={e => this.saveRow(e, record.key)}>保存</a>
-                <Divider type="vertical" />
-                <a onClick={e => this.cancel(e, record.key)}>取消</a>
-              </span>
-            );
-          }
           return (
-            <span>
-              <a onClick={e => this.toggleEditable(e, record.key)}>编辑</a>
-              <Divider type="vertical" />
-              <Popconfirm title="是否要删除此行？" onConfirm={() => this.remove(record.key)}>
-                <a>删除</a>
-              </Popconfirm>
-            </span>
+            <EditableCell
+              value={text}
+              type="propertyChange"
+              onChange={this.onCellChange(record.deviceName, 'reportingPeriod')}
+            />
           );
         },
       },
@@ -288,7 +276,6 @@ export default class DeviceProperty extends Component {
         </div>
       </div>
     );
-    console.log(this.state.data);
     return (
       <PageHeaderLayout title="设备属性" content="用于查询/设置设备属性">
         <Card loading={loading} bordered={false} bodyStyle={{ padding: 0 }}>
@@ -304,6 +291,7 @@ export default class DeviceProperty extends Component {
                     rowClassName={record => {
                       return record.editable ? styles.editable : '';
                     }}
+                    bordered
                   />
                 </div>
               </TabPane>

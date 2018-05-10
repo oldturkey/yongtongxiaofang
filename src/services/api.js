@@ -123,3 +123,11 @@ export async function getdevicelist() {
     method: 'POST',
   });
 }
+
+//设备服务调用的接口，可以一次设定多个设备属性
+export async function setdeviceparam(params) {
+  return request('Rapi/setting/setdeviceparam', {
+    method: 'POST',
+    body: params,
+  });
+}

@@ -1,4 +1,4 @@
-import { getdevicelist } from '../services/api';
+import { getdevicelist, setdeviceparam } from '../services/api';
 export default {
   namespace: 'property',
 
@@ -17,6 +17,22 @@ export default {
         },
       });
     },
+    fetchCurrent: [
+      function* fn({ payload, callback }, { call, put }) {
+        const result = yield call(setdeviceparam, payload);
+        if (result.error == null) {
+          const response = yield call(getdevicelist);
+          yield put({
+            type: 'save',
+            payload: {
+              deviceList: response,
+            },
+          });
+          if (callback) callback();
+        }
+      },
+      { type: 'takeLatest' },
+    ],
   },
 
   reducers: {
