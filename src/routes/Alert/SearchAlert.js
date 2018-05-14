@@ -35,7 +35,7 @@ const options = [
 
 @connect(({ alert, loading }) => ({
   alert,
-  loading: loading.effects['chart/fetchList'],
+  loading: loading.effects['alert/fetchCurrentDevice'],
 }))
 export default class Alert extends React.Component {
   state = {

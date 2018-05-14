@@ -66,20 +66,34 @@ export default class Analysis extends Component {
     this.props.dispatch({
       type: 'chart/fetchCurrentDevice',
       payload: {
-        deviceName: value[value.length - 1],
-        beginTime: time[0].format('YYYY-MM-DD HH:mm'),
-        endTime: time[1].format('YYYY-MM-DD HH:mm'),
+        deviceName: value.length > 0 ? value[value.length - 1] : this.props.chart.deviceName,
+        beginTime:
+          time.length > 0
+            ? time[0].format('YYYY-MM-DD HH:mm')
+            : getTimeDistance('today')[0].format('YYYY-MM-DD HH:mm'),
+        endTime:
+          time.length > 0
+            ? time[1].format('YYYY-MM-DD HH:mm')
+            : getTimeDistance('today')[1].format('YYYY-MM-DD HH:mm'),
       },
     });
   };
   handleRangePickerChange = value => {
     this.setState({ rangePickerValue: value });
+  };
+  onOk = () => {
+    const value = this.state.rangePickerValue;
     this.props.dispatch({
       type: 'chart/fetchCurrentDevice',
       payload: {
         deviceName: this.props.chart.deviceName,
-        beginTime: value[0].format('YYYY-MM-DD HH:mm'),
-        endTime: value[1].format('YYYY-MM-DD HH:mm'),
+        beginTime:
+          value.length > 0
+            ? value[0].format('YYYY-MM-DD HH:mm')
+            : getTimeDistance('today')[0].format('YYYY-MM-DD HH:mm'),
+        endTime: value.length
+          ? value[1].format('YYYY-MM-DD HH:mm')
+          : getTimeDistance('today')[1].format('YYYY-MM-DD HH:mm'),
       },
     });
   };
@@ -120,6 +134,7 @@ export default class Analysis extends Component {
           showTime={{ format: 'HH:mm' }}
           format="YYYY-MM-DD HH:mm"
           value={rangePickerValue}
+          onOk={this.onOk}
           onChange={this.handleRangePickerChange}
           style={{ width: 276 }}
         />
@@ -130,7 +145,7 @@ export default class Analysis extends Component {
       chartData && chartData.length > 0
         ? chartData.map(item => {
             return {
-              x: item.gmtCreate,
+              x: new Date(item.gmtCreate).getTime(),
               y1: item.hydraulicPress,
               y2: item.liquidLevel,
             };
